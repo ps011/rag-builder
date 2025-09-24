@@ -1,0 +1,19 @@
+{
+  "name": "rag-builder",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@langchain/community": "^0.3.56",
+    "@langchain/core": "^0.3.77",
+    "@langchain/openai": "^0.6.13",
+    "chromadb": "^3.0.12"
+  }
+}

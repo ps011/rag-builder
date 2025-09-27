@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Builder - Knowledge Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-brain"></i> RAG Builder</h1>
+                <p>Your Personal Knowledge Assistant</p>
+            </div>
+            <div class="header-actions">
+                <div class="status-indicator" id="statusIndicator">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">Initializing...</span>
+                </div>
+                <button id="refreshButton" class="refresh-button" disabled>
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Refresh</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Query Section -->
+            <section class="query-section">
+                <div class="query-container">
+                    <div class="input-group">
+                        <textarea 
+                            id="queryInput" 
+                            placeholder="Ask me anything about your notes... (e.g., 'What did I learn about machine learning?')"
+                            rows="3"
+                        ></textarea>
+                        <button id="queryButton" class="query-button" disabled>
+                            <i class="fas fa-search"></i>
+                            <span>Ask</span>
+                        </button>
+                    </div>
+                    <div class="query-suggestions">
+                        <span class="suggestion-label">Try asking:</span>
+                        <button class="suggestion-chip" data-query="What are the main topics in my notes?">Main topics</button>
+                        <button class="suggestion-chip" data-query="Summarize my recent learnings">Recent learnings</button>
+                        <button class="suggestion-chip" data-query="What projects am I working on?">Current projects</button>
+                    </div>
+                </div>
+            </section>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="loading-indicator hidden">
+            <div class="spinner"></div>
+            <p>Searching your knowledge base...</p>
+        </div>
+
+        <!-- Refresh Progress Modal -->
+        <div id="refreshModal" class="refresh-modal hidden">
+            <div class="refresh-modal-content">
+                <div class="refresh-header">
+                    <h3><i class="fas fa-sync-alt"></i> Refreshing Knowledge Base</h3>
+                </div>
+                <div class="refresh-progress">
+                    <div class="progress-bar">
+                        <div id="refreshProgressBar" class="progress-fill"></div>
+                    </div>
+                    <div id="refreshStatus" class="refresh-status">Starting refresh...</div>
+                </div>
+                <div class="refresh-stats" id="refreshStats"></div>
+            </div>
+        </div>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="results-section hidden">
+                <div class="results-header">
+                    <h2><i class="fas fa-lightbulb"></i> Answer</h2>
+                    <div class="search-meta" id="searchMeta"></div>
+                </div>
+                
+                <div class="answer-container">
+                    <div id="answerContent" class="answer-content"></div>
+                </div>
+
+                <!-- Sources Section -->
+                <div class="sources-section">
+                    <h3><i class="fas fa-file-alt"></i> Sources</h3>
+                    <div id="sourcesList" class="sources-list"></div>
+                </div>
+            </section>
+
+            <!-- Error Section -->
+            <div id="errorSection" class="error-section hidden">
+                <div class="error-content">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Oops! Something went wrong</h3>
+                    <p id="errorMessage"></p>
+                    <button id="retryButton" class="retry-button">
+                        <i class="fas fa-redo"></i>
+                        Try Again
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Debug Panel -->
+        <aside class="debug-panel" id="debugPanel">
+            <div class="debug-header">
+                <h3><i class="fas fa-bug"></i> Debug Tools</h3>
+                <button id="toggleDebug" class="toggle-button">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="debug-content" id="debugContent">
+                <div class="debug-section">
+                    <h4>System Statistics</h4>
+                    <button id="getStatsButton" class="debug-button">
+                        <i class="fas fa-chart-bar"></i>
+                        Get Stats
+                    </button>
+                    <div id="statsDisplay" class="stats-display hidden"></div>
+                </div>
+                
+                <div class="debug-section">
+                    <h4>Test Search</h4>
+                    <div class="debug-input-group">
+                        <input type="text" id="debugSearchInput" placeholder="Test search query...">
+                        <button id="debugSearchButton" class="debug-button">
+                            <i class="fas fa-search"></i>
+                            Test
+                        </button>
+                    </div>
+                    <div id="debugSearchResults" class="debug-results hidden"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2025 RAG Builder - Powered by Ollama & ChromaDB</p>
+                <div class="footer-links">
+                    <a href="#" id="toggleTheme">
+                        <i class="fas fa-moon"></i>
+                        Dark Mode
+                    </a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

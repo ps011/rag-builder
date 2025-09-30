@@ -48,6 +48,19 @@ class RAGWebApp {
             this.initializeSystem();
         });
 
+        // Settings modal
+        document.getElementById('settingsButton').addEventListener('click', () => {
+            this.showSettingsModal();
+        });
+
+        document.getElementById('closeSettingsButton').addEventListener('click', () => {
+            this.hideSettingsModal();
+        });
+
+        document.getElementById('saveVaultPathButton').addEventListener('click', () => {
+            this.updateVaultPath();
+        });
+
         // Debug panel
         document.getElementById('toggleDebug').addEventListener('click', () => {
             this.toggleDebugPanel();
@@ -94,6 +107,9 @@ class RAGWebApp {
                 if (data.stats) {
                     this.displaySystemStats(data.stats);
                 }
+                
+                // Fetch and display the current vault path
+                this.fetchVaultPath();
             } else {
                 throw new Error(data.error || 'Failed to initialize system');
             }
@@ -248,6 +264,47 @@ class RAGWebApp {
         }
     }
 
+    showSettingsModal() {
+        const settingsModal = document.getElementById('settingsModal');
+        settingsModal.classList.remove('hidden');
+        
+        // Add click outside to close functionality
+        settingsModal.addEventListener('click', (e) => {
+            // Close the modal if the click is outside the modal content
+            if (e.target === settingsModal) {
+                this.hideSettingsModal();
+            }
+        });
+        
+        // Add escape key to close functionality
+        const escKeyHandler = (e) => {
+            if (e.key === 'Escape') {
+                this.hideSettingsModal();
+            }
+        };
+        document.addEventListener('keydown', escKeyHandler);
+        
+        // Store the handler for later removal
+        this.escKeyHandler = escKeyHandler;
+        
+        // Fetch the current vault path when opening the modal
+        this.fetchVaultPath();
+    }
+    
+    hideSettingsModal() {
+        const settingsModal = document.getElementById('settingsModal');
+        settingsModal.classList.add('hidden');
+        
+        // Remove the click event listener when hiding the modal
+        settingsModal.removeEventListener('click', () => {});
+        
+        // Remove escape key handler
+        if (this.escKeyHandler) {
+            document.removeEventListener('keydown', this.escKeyHandler);
+            this.escKeyHandler = null;
+        }
+    }
+    
     toggleDebugPanel() {
         const debugPanel = document.getElementById('debugPanel');
         const toggleButton = document.getElementById('toggleDebug');
@@ -259,6 +316,70 @@ class RAGWebApp {
             icon.className = 'fas fa-chevron-up';
         } else {
             icon.className = 'fas fa-chevron-down';
+        }
+    }
+    
+    async fetchVaultPath() {
+        try {
+            const response = await fetch('/api/settings/vault-path');
+            const data = await response.json();
+            
+            if (data.success) {
+                const currentVaultPath = document.getElementById('currentVaultPath');
+                currentVaultPath.textContent = data.vaultPath || 'Not set';
+                
+                // Also update the input field with the current value
+                const vaultPathInput = document.getElementById('vaultPathInput');
+                vaultPathInput.value = data.vaultPath || '';
+            } else {
+                throw new Error(data.error || 'Failed to fetch vault path');
+            }
+        } catch (error) {
+            console.error('Error fetching vault path:', error);
+            this.showNotification('Failed to fetch vault path: ' + error.message, 'error');
+        }
+    }
+    
+    async updateVaultPath() {
+        const vaultPathInput = document.getElementById('vaultPathInput');
+        const newPath = vaultPathInput.value.trim();
+        
+        if (!newPath) {
+            this.showNotification('Please enter a valid path', 'warning');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/settings/vault-path', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ vaultPath: newPath })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Update the displayed path
+                const currentVaultPath = document.getElementById('currentVaultPath');
+                currentVaultPath.textContent = newPath;
+                
+                this.showNotification('Obsidian vault path updated successfully!', 'success');
+                
+                // Hide the settings modal
+                this.hideSettingsModal();
+                
+                // Ask if the user wants to refresh the vector store with the new path
+                if (confirm('Would you like to refresh the vector store with the new vault path?')) {
+                    this.refreshVectorStore();
+                }
+            } else {
+                throw new Error(data.error || 'Failed to update vault path');
+            }
+        } catch (error) {
+            console.error('Error updating vault path:', error);
+            this.showNotification('Failed to update vault path: ' + error.message, 'error');
         }
     }
 

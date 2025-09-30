@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,6 +23,9 @@
                 <button id="refreshButton" class="refresh-button" disabled>
                     <i class="fas fa-sync-alt"></i>
                     <span>Refresh</span>
+                </button>
+                <button id="settingsButton" class="settings-button">
+                    <i class="fas fa-cog"></i>
                 </button>
             </div>
         </header>
@@ -73,6 +76,34 @@
                 <div class="refresh-stats" id="refreshStats"></div>
             </div>
         </div>
+        
+        <!-- Settings Modal -->
+        <div id="settingsModal" class="settings-modal hidden">
+            <div class="settings-modal-content">
+                <div class="settings-modal-header">
+                    <h3><i class="fas fa-cog"></i> Settings</h3>
+                    <button id="closeSettingsButton" class="close-button">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="settings-modal-body">
+                    <div class="settings-section">
+                        <h4>Obsidian Vault Path</h4>
+                        <div class="vault-path-container">
+                            <div class="current-path" id="currentVaultPath">Loading...</div>
+                            <div class="input-group">
+                                <input type="text" id="vaultPathInput" placeholder="Enter new vault path...">
+                                <button id="saveVaultPathButton" class="action-button">
+                                    <i class="fas fa-save"></i>
+                                    Save
+                                </button>
+                            </div>
+                            <p class="settings-help">Enter the full path to your Obsidian vault directory.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
             <!-- Results Section -->
             <section id="resultsSection" class="results-section hidden">
@@ -105,6 +136,7 @@
                 </div>
             </div>
         </main>
+
 
         <!-- Debug Panel -->
         <aside class="debug-panel" id="debugPanel">

@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { loadConfig, validateOllama } from './config.js';
+import { loadConfig, validateOllama, updateVaultPath } from './config.js';
 import { loadMarkdownDocuments, validateDocumentsPath } from './documentLoader.js';
 import { 
   createEmbeddings, 
@@ -12,7 +12,7 @@ import {
   splitDocumentsIntoChunks, 
   addChunksToVectorStore 
 } from './vectorStore.js';
-import { performHybridSearch, filterResultsByRelevance, buildContextFromResults, getVectorStoreStats } from './search.js';
+import { performHybridSearch, getVectorStoreStats } from './search.js';
 import { performAdvancedSearch, rerankResults, buildEnhancedContext, createEnhancedPrompt } from './advancedSearch.js';
 import { Ollama } from "@langchain/ollama";
 
@@ -246,6 +246,63 @@ class RAGWebServer {
         res.status(500).json({ 
           success: false, 
           error: error.message 
+        });
+      }
+    });
+
+    // Settings endpoints
+    this.app.get('/api/settings/vault-path', (req, res) => {
+      try {
+        // Load the current config to get the latest vault path
+        const config = loadConfig();
+        res.json({ 
+          success: true, 
+          vaultPath: config.docsPath 
+        });
+      } catch (error) {
+        res.status(500).json({ 
+          success: false, 
+          error: error.message 
+        });
+      }
+    });
+    
+    this.app.post('/api/settings/vault-path', async (req, res) => {
+      try {
+        const { vaultPath } = req.body;
+        
+        if (!vaultPath) {
+          return res.status(400).json({
+            success: false,
+            error: 'Vault path is required'
+          });
+        }
+        
+        // Validate that the path exists
+        const isValidPath = await validateDocumentsPath(vaultPath);
+        if (!isValidPath) {
+          return res.status(400).json({
+            success: false,
+            error: 'Invalid vault path. Path must exist and contain markdown files.'
+          });
+        }
+        
+        // Update the vault path
+        const updated = await updateVaultPath(vaultPath);
+        
+        if (!updated) {
+          throw new Error('Failed to update vault path');
+        }
+        
+        res.json({
+          success: true,
+          message: 'Vault path updated successfully',
+          vaultPath
+        });
+      } catch (error) {
+        res.status(500).json({
+          success: false,
+          error: error.message
         });
       }
     });

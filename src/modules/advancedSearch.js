@@ -1,5 +1,5 @@
 // Advanced search and retrieval enhancements
-import { performHybridSearch, filterResultsByRelevance, buildContextFromResults, getVectorStoreStats } from './search.js';
+import { performHybridSearch } from './search.js';
 
 /**
  * Expands a query with synonyms and related terms
@@ -20,7 +20,8 @@ export function expandQuery(query) {
     'solution': ['answer', 'fix', 'resolution', 'remedy'],
     'goal': ['objective', 'target', 'aim', 'purpose'],
     'plan': ['strategy', 'approach', 'method', 'scheme'],
-    'result': ['outcome', 'consequence', 'effect', 'conclusion']
+    'result': ['outcome', 'consequence', 'effect', 'conclusion'],
+    'bhaiya': ['brother', 'anshul', 'anshul bhaiya'],
   };
   
   const words = query.toLowerCase().split(/\s+/);
@@ -100,6 +101,7 @@ export function rerankResults(results, query) {
     // Boost score for exact phrase matches
     const content = result.document.pageContent.toLowerCase();
     const fileName = (result.document.metadata?.fileName || '').toLowerCase();
+    const directory = (result.document.metadata?.directory || '').toLowerCase();
     
     // Exact phrase match boost
     if (content.includes(query.toLowerCase())) {
@@ -110,6 +112,11 @@ export function rerankResults(results, query) {
     if (fileName.includes(query.toLowerCase())) {
       rerankScore += 0.15;
     }
+
+    // Directory match boost
+    if (directory.length > 0 && query.toLowerCase().split(' ').some(word => directory.includes(word))) {
+        rerankScore += 0.1;
+    }
     
     // Word frequency boost
     let wordFrequency = 0;
@@ -117,7 +124,8 @@ export function rerankResults(results, query) {
       const regex = new RegExp(`\\b${word}\\b`, 'gi');
       const contentMatches = (content.match(regex) || []).length;
       const fileNameMatches = (fileName.match(regex) || []).length;
-      wordFrequency += contentMatches + fileNameMatches * 2; // Filename matches weighted more
+      const directoryMatches = (directory.match(regex) || []).length;
+      wordFrequency += contentMatches + (fileNameMatches * 2) + (directoryMatches * 1.5); // Weight directory matches more
     });
     
     rerankScore += Math.min(wordFrequency * 0.05, 0.3); // Cap the boost
@@ -145,13 +153,15 @@ export function rerankResults(results, query) {
  */
 export function buildEnhancedContext(results) {
   return results.map((result, index) => {
-    const source = result.document.metadata?.fileName || result.document.metadata?.source || 'Unknown';
+    const source = result.document.metadata?.fileName || 'Unknown';
+    const directory = result.document.metadata?.directory;
     const relevance = result.relevance;
     const searchType = result.type;
     const score = result.rerankScore ? result.rerankScore.toFixed(3) : result.score.toFixed(3);
     const originalScore = result.originalScore ? ` (orig: ${result.originalScore.toFixed(3)})` : '';
+    const directoryInfo = directory ? ` | Directory: ${directory}` : '';
     
-    return `[Source ${index + 1}: ${source} | Relevance: ${relevance} | Score: ${score}${originalScore} | Type: ${searchType}]\n${result.document.pageContent}`;
+    return `[Source ${index + 1}: ${source}${directoryInfo} | Relevance: ${relevance} | Score: ${score}${originalScore} | Type: ${searchType}]\n${result.document.pageContent}`;
   }).join("\n\n---\n\n");
 }
 

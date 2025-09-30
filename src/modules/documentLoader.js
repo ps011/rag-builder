@@ -24,6 +24,7 @@ export async function loadMarkdownDocuments(dirPath, basePath) {
         const content = await fs.readFile(fullPath, "utf-8");
         const fileName = path.basename(fullPath, '.md');
         const relativePath = path.relative(basePath, fullPath);
+        const directory = path.dirname(relativePath); // Extract directory path
         
         documents.push({
           pageContent: content,
@@ -31,6 +32,7 @@ export async function loadMarkdownDocuments(dirPath, basePath) {
             source: fullPath,
             fileName: fileName,
             relativePath: relativePath,
+            directory: directory === '.' ? '' : directory, // Add directory, handle root case
             fileType: 'markdown'
           },
         });

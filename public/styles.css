@@ -311,8 +311,15 @@ body {
   border: 1px solid var(--border-color);
   border-radius: 2rem;
   font-size: 0.9rem;
+  color: var(--text-secondary);
   cursor: pointer;
   transition: var(--transition);
+}
+
+[data-theme="dark"] .suggestion-chip {
+  background-color: var(--surface-color);
+  border: 1px solid var(--primary-color);
+  color: var(--text-primary);
 }
 
 .suggestion-chip:hover {
@@ -423,6 +430,20 @@ body {
 .source-title {
   font-weight: 600;
   color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+.source-directory {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.source-directory i {
+    color: var(--primary-color);
+    margin-right: 0.25rem;
 }
 
 .source-meta {

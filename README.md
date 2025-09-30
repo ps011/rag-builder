@@ -298,6 +298,10 @@ The RAG system includes several advanced features to maximize answer accuracy:
    - Word frequency
    - Document recency
 
+### Directory-Aware Context
+
+To further improve accuracy, the system now includes the directory structure of your notes in the metadata. Folder names are used as additional context during search and reranking, giving more weight to documents where keywords match the folder names. This helps the model better understand the topic of your notes.
+
 ### Configuration Options
 
 You can fine-tune accuracy by setting these environment variables in your `.env` file:

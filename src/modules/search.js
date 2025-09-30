@@ -28,11 +28,11 @@ export async function performHybridSearch(vectorStore, query, k = 5) {
     for (const doc of allDocs) {
       const content = doc.pageContent.toLowerCase();
       const fileName = (doc.metadata?.fileName || '').toLowerCase();
-      const relativePath = (doc.metadata?.relativePath || '').toLowerCase();
+      const directory = (doc.metadata?.directory || '').toLowerCase();
       
       let keywordMatches = 0;
       for (const keyword of keywords) {
-        if (content.includes(keyword) || fileName.includes(keyword) || relativePath.includes(keyword)) {
+        if (content.includes(keyword) || fileName.includes(keyword) || directory.includes(keyword)) {
           keywordMatches++;
         }
       }

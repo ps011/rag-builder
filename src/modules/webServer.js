@@ -164,6 +164,7 @@ class RAGWebServer {
         const sources = relevantResults.map((result, index) => ({
           id: index + 1,
           fileName: result.document.metadata?.fileName || 'Unknown',
+          directory: result.document.metadata?.directory || null,
           source: result.document.metadata?.source || 'Unknown',
           relevance: result.relevance,
           score: (result.rerankScore || result.score).toFixed(3),

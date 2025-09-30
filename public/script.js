@@ -162,9 +162,14 @@ class RAGWebApp {
         data.sources.forEach(source => {
             const sourceElement = document.createElement('div');
             sourceElement.className = 'source-item';
+            const directoryDisplay = source.directory ? `<div class="source-directory"><i class="fas fa-folder-open"></i> ${source.directory}</div>` : '';
+
             sourceElement.innerHTML = `
                 <div class="source-header">
-                    <div class="source-title">${source.fileName}</div>
+                    <div class="source-title">
+                        ${directoryDisplay}
+                        <span>${source.fileName}</span>
+                    </div>
                     <div class="source-meta">
                         <span class="meta-badge relevance-${source.relevance}">${source.relevance}</span>
                         <span class="meta-badge type-${source.type}">${source.type}</span>

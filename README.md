@@ -116,6 +116,45 @@ node src/main.js --refresh
 node src/web.js --refresh
 ```
 
+## Deploying with Docker
+
+The easiest way to run the entire RAG Builder stack (including the web app, Ollama, and ChromaDB) is with Docker.
+
+### Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/) installed on your system.
+- [Docker Compose](https://docs.docker.com/compose/install/) (usually included with Docker Desktop).
+
+### Running with Docker
+
+1.  **Configure the Vault Path**:
+    Open the `docker-compose.yml` file and find the `volumes` section for the `app` service. Change the line `- ./path/to/your/vault:/app/vault` to point to the actual path of your Obsidian vault on your local machine.
+
+    For example:
+    ```yaml
+    volumes:
+      - /Users/yourname/Documents/ObsidianVault:/app/vault
+    ```
+
+2.  **Build and Start the Services**:
+    Open a terminal in the project root and run:
+    ```bash
+    docker-compose up --build
+    ```
+    This command will build the Docker image for the app, download the necessary Ollama and ChromaDB images, and start all the services.
+
+3.  **Pull the Ollama Model**:
+    The first time you run the application, you need to pull the language model. Open a **new terminal window** and run:
+    ```bash
+    docker-compose exec ollama ollama pull llama3
+    ```
+    *(Replace `llama3` with your preferred model if it's different)*
+
+4.  **Access the Application**:
+    Once all services are running, you can access the web interface by navigating to `http://localhost:3000` in your web browser.
+
+The data for Ollama and ChromaDB will be persisted in Docker volumes, so you won't lose your models or your vector database when you stop the application.
+
 ## Configuration
 
 ### Environment Variables
